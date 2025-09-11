@@ -27,9 +27,9 @@ const Dashboard = () => {
               <h5 className="card-title">
                 <i className="fas fa-list text-success fs-1"></i>
               </h5>
-              <h6 className="card-subtitle mb-2 text-muted">View Products</h6>
+              <h6 className="card-subtitle mb-2 text-muted">List Products</h6>
               <p className="card-text">View and manage your product inventory</p>
-              <Link to="/products/list" className="btn btn-success">View Products</Link>
+              <Link to="/products/list" className="btn btn-success">List Products</Link>
             </div>
           </div>
         </div>
@@ -46,6 +46,20 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
+
+        <div className = "col-md-4 mb-4">
+          <div className = "card text-center">
+            <div  className="card-body">
+              <h5 className="card-title">
+                <i className="fas fa-file-upload text-info fs-1"></i>
+              </h5>
+              <h6 className="card-subtitle mb-2 text-muted">Upload Excel</h6>
+              <p className="card-text">Upload excel file</p>
+              <Link to="/upload" className="btn btn-info">Upload</Link>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   );

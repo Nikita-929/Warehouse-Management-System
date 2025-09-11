@@ -23,9 +23,9 @@ const ListProducts = ({ showToast }) => {
             batch_no: 'BATCH001',
             grn_no: 'GRN001',
             sales_invoice_no: 'INV001',
-            material_type: 'Raw Material',
+            material_type: 'RM',
             source: 'Supplier X',
-            created_at: '2023-05-15 10:30:00'
+            created_at: '2-10-2025 10:30:00'
           },
           {
             id: 2,
@@ -38,9 +38,9 @@ const ListProducts = ({ showToast }) => {
             batch_no: 'BATCH002',
             grn_no: 'GRN002',
             sales_invoice_no: 'INV002',
-            material_type: 'Finished Goods',
+            material_type: 'FM',
             source: 'Supplier Y',
-            created_at: '2023-05-16 14:45:00'
+            created_at: '1-10-2025 14:45:00'
           }
         ];
         
@@ -121,7 +121,7 @@ const ListProducts = ({ showToast }) => {
                     <th>Batch No</th>
                     <th>GRN No</th>
                     <th>Material Type</th>
-                    <th>Source</th>
+                    <th>Supplier/Client/Production floor</th>
                     <th>Date Added</th>
                     <th>Actions</th>
                   </tr>

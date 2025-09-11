@@ -13,7 +13,8 @@ const AddProduct = ({ showToast }) => {
     grn_no: '',
     sales_invoice_no: '',
     material_type: '',
-    source: ''
+    source: '',
+    date: ''
   });
   
   const [productNames, setProductNames] = useState([]);
@@ -41,22 +42,27 @@ const AddProduct = ({ showToast }) => {
   }, [showToast]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    
-    // Calculate quantity if packets and qty_per_packet change
-    if ((name === 'packets' || name === 'qty_per_packet') && 
-        formData.packets && formData.qty_per_packet) {
-      const calculatedQty = parseFloat(formData.packets) * parseFloat(formData.qty_per_packet);
-      setFormData(prev => ({
-        ...prev,
-        quantity: calculatedQty.toString()
-      }));
+  const { name, value } = e.target;
+
+  setFormData(prev => {
+    const updatedForm = { ...prev, [name]: value };
+
+    if (updatedForm.packets && updatedForm.qty_per_packet) {
+      updatedForm.quantity = (
+        parseFloat(updatedForm.packets) * parseFloat(updatedForm.qty_per_packet)
+      ).toString();
+    } else {
+      updatedForm.quantity = ''; // clear if not both entered
     }
-  };
+
+    return updatedForm;
+  });
+};
+
+  
+     
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -78,28 +84,54 @@ const AddProduct = ({ showToast }) => {
         grn_no: '',
         sales_invoice_no: '',
         material_type: '',
-        source: ''
+        source: '',
+        date: ''
       });
     } catch (error) {
       showToast('Error adding product', 'error');
     }
   };
 
-  const handleIncrement = (field) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: (parseInt(prev[field] || 0) + 1).toString()
-    }));
-  };
 
-  const handleDecrement = (field) => {
-    if (parseInt(formData[field] || 0) > 0) {
-      setFormData(prev => ({
-        ...prev,
-        [field]: (parseInt(prev[field] || 0) - 1).toString()
-      }));
+  const handleIncrement = () => {
+  setFormData(prev => {
+    const currentValue = parseFloat(prev.packets || 0);
+    const newValue = (currentValue + 0.1).toFixed(1);
+    let updatedForm = { ...prev, packets: newValue };
+
+    if (updatedForm.packets && updatedForm.qty_per_packet) {
+      updatedForm.quantity = (
+        parseFloat(updatedForm.packets) * parseFloat(updatedForm.qty_per_packet)
+      ).toFixed(2);
+    } else {
+      updatedForm.quantity = '';
     }
-  };
+
+    return updatedForm;
+  });
+};
+
+const handleDecrement = () => {
+  setFormData(prev => {
+    const currentValue = parseFloat(prev.packets || 0);
+    if (currentValue > 0) {
+      const newValue = Math.max(0, (currentValue - 0.1)).toFixed(1);
+      let updatedForm = { ...prev, packets: newValue };
+
+      if (updatedForm.packets && updatedForm.qty_per_packet) {
+        updatedForm.quantity = (
+          parseFloat(updatedForm.packets) * parseFloat(updatedForm.qty_per_packet)
+        ).toFixed(2);
+      } else {
+        updatedForm.quantity = '';
+      }
+
+      return updatedForm;
+    }
+    return prev;
+  });
+};
+
 
   return (
     <div>
@@ -148,7 +180,7 @@ const AddProduct = ({ showToast }) => {
                   <button 
                     className="btn btn-outline-secondary" 
                     type="button"
-                    onClick={() => handleDecrement('packets')}
+                    onClick={handleDecrement}
                   >
                     -
                   </button>
@@ -164,7 +196,7 @@ const AddProduct = ({ showToast }) => {
                   <button 
                     className="btn btn-outline-secondary" 
                     type="button"
-                    onClick={() => handleIncrement('packets')}
+                    onClick={handleIncrement}
                   >
                     +
                   </button>
@@ -180,7 +212,7 @@ const AddProduct = ({ showToast }) => {
                   value={formData.qty_per_packet}
                   onChange={handleChange}
                   min="0"
-                  step="0.01"
+                  step="1"
                 />
               </div>
               <div className="col-md-4">
@@ -190,11 +222,8 @@ const AddProduct = ({ showToast }) => {
                   className="form-control" 
                   id="quantity"
                   name="quantity"
-                  value={formData.quantity}
-                  onChange={handleChange}
-                  readOnly={formData.packets && formData.qty_per_packet}
-                  min="0"
-                  step="0.01"
+                  value={formData.quantity}                  
+                  readOnly                  
                 />
               </div>
             </div>
@@ -250,39 +279,67 @@ const AddProduct = ({ showToast }) => {
               </div>
               <div className="col-md-4">
                 <label htmlFor="material_type" className="form-label">Material Type *</label>
-                <input 
-                  type="text" 
-                  className="form-control" 
+                <select
+                  className="form-select"
                   id="material_type"
                   name="material_type"
                   value={formData.material_type}
                   onChange={handleChange}
-                  required 
-                />
+                  required
+                  >
+                    <option value="">Select Material Type</option>
+                    <option value="rm">RM</option>
+                    <option value="pm">PM</option>
+                    <option value="fm">FM</option>
+                  </select>
+                
               </div>
               <div className="col-md-4">
-                <label htmlFor="source" className="form-label">Source *</label>
-                <select 
-                  className="form-select" 
-                  id="source"
-                  name="source"
-                  value={formData.source}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="">Select Source</option>
-                  {suppliers.map((supplier, index) => (
-                    <option key={index} value={supplier.name}>
-                      {supplier.name} ({supplier.type})
-                    </option>
-                  ))}
-                </select>
+                <label htmlFor="source" className="form-label">Supplier/Client/Production Floor *</label>
+                <input
+                 type='text'
+                 className='form-control'
+                 id="source"
+                 name="source"
+                 value={formData.source}
+                 onChange={handleChange}
+                 required
+                />              
+              </div>
+
+              <div className='col-md-4'>
+                <label htmlFor='date' className='form-label'>Date</label>
+                <input
+                type='date'
+                className='form-control'
+                id="date"
+                name="date"
+                value={formData.date}
+                onChange={handleChange}
+                required
+                />
               </div>
             </div>
             
             <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-              <button type="reset" className="btn btn-secondary me-md-2">Reset</button>
-              <button type="submit" className="btn btn-primary">Add Product</button>
+              <button type="button" className="btn btn-secondary me-md-2"
+              onClick={()=> setFormData({
+                product_code: '',
+                product_name: '',
+                packets: '',
+                qty_per_packet: '',
+                quantity: '',
+                unit: '',
+                batch_no: '',
+                grn_no: '',
+                sales_invoice_no: '',
+                material_type: '',
+                source: '',
+                date: ''
+              })}
+              >
+                Reset</button>
+              <button type="submit" className="btn btn-primary">Save Product</button>
             </div>
           </form>
         </div>
